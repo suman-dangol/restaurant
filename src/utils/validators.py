@@ -1,0 +1,1 @@
+'''validate_price(), validate_id(), validate_quantity()'''

@@ -1,0 +1,8 @@
+id|name|category|price
+1|Tomato Soup|Starter|4.50
+2|Chicken Burger|Main|9.99
+3|Veggie Pizza|Main|8.50
+4|Chocolate Cake|Dessert|5.00
+5|Ice Cream Sundae|Dessert|4.75
+6|Lemonade|Beverage|2.50
+7|Coffee|Beverage|3.00

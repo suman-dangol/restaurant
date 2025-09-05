@@ -1,0 +1,6 @@
+username|password|role
+admin|adminpass|admin
+staff1|staffpass1|staff
+staff2|staffpass2|staff
+alice|alicepass|customer
+bob|bobpass|customer
