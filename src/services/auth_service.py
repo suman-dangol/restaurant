@@ -26,6 +26,8 @@ class AuthService:
                 if username == u_name and password == u_password:
                     if u_role == "admin":
                         self.current_user = Admin(username, u_password)
+                        
+                        
                     elif u_role == "staff":
                         self.current_user = Staff(username, u_password)
                     elif u_role == "customer":

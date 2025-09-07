@@ -1,5 +1,6 @@
 import os
 from src.utils.file_manager import FileManager
+from src.ui.mainui import MainUi
 
 #filepath Setup
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -17,12 +18,8 @@ def main():
     print("Welcome to the Restaurant Management System")
     # Further implementation will go here
     
-    auth = auth_service.AuthService(user_file_path)
-    try:
-        auth.login("admin", "adminpass")
-        print(f"Logged in as: {auth.current_user}")
-    except Exception as e:
-        print(f"Login failed: {e}")
+    main_ui = MainUi()
+    main_ui.show_main_menu()
         
 if __name__ == "__main__":
     main()
