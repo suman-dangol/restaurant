@@ -17,7 +17,6 @@ class MainUi:
 
             choice = input("Enter your choice: ").strip()
             
-            
             if choice == "1":
                 self.handle_login()
             elif choice == "2":

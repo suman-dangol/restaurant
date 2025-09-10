@@ -19,4 +19,4 @@ class StaffUI:
                 print("Logging out...")
                 break
             else:
-                print("❌ Invalid option.")
+                print("Invalid option.")
