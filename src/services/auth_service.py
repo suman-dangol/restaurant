@@ -11,7 +11,7 @@ class AuthService:
 
     def login(self, username, password):
         try:
-            if not os.path.exists(self.user_file_path):
+            if not FileManager.file_exists(self.user_file_path):
                 raise FileError(f"User file not found: {self.user_file_path}, this error is generated in auth_service.")
             
             users = FileManager.read_file(self.user_file_path)

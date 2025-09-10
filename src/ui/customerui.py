@@ -1,12 +1,16 @@
 import time
 from src.utils.file_manager import FileManager
-from src.utils.exceptions import FileError
+from src.utils.exceptions import FileError, ValidationError
+from src.services.menu_service import MenuService
+from src.services.order_service import OrderService
 
 class CustomerUI:
     def __init__(self, user):
         self.user = user
         self.menu_file_path = "src/data/menu.txt"
         self.orders_file_path = "src/data/orders.txt"
+        self.menu_service = MenuService()
+        self.order_service = OrderService()
 
     def show_menu(self):
         while True:
@@ -37,28 +41,58 @@ class CustomerUI:
             for line in menu_lines:
                 print(line)
         except FileError as e:
-            print(f"Error viewing menu: {e}")
+            print(f"Error viewing menu: {e}, #customerui.py")
 
     def place_order(self):
         print("\n=== Place Order ===")
         try:
-            order_id = input("Enter order ID: ").strip()
-            item_name = input("Enter item name: ").strip()
-            quantity = input("Enter quantity: ").strip()
-            unit_price = input("Enter unit price: ").strip()
+            # Display available menu items with IDs
+            print("\n=== Menu ===")
+            for item in self.menu_service.menu_items:
+                print(f"{item.item_id}: {item.name} - ${item.price}")
 
-            timestamp = str(int(time.time()))
-            status = "pending"
-            handled_by = "N/A"  # No staff is assigned when the order is placed
+            while True:
+                try:
+                    # Input item IDs
+                    item_ids_input = input("\nEnter item IDs (comma-separated): ").strip()
+                    if not item_ids_input:
+                        print("Please enter at least one item ID.")
+                        continue
+                    
+                    item_ids = [int(item_id.strip()) for item_id in item_ids_input.split(",")]
+                    
+                    # Validate item IDs
+                    valid_ids = [item.item_id for item in self.menu_service.menu_items]
+                    invalid_ids = [id for id in item_ids if id not in valid_ids]
+                    
+                    if invalid_ids:
+                        print(f"Invalid item IDs: {invalid_ids}. Please try again.")
+                        continue
+                    
+                    break
+                except ValueError:
+                    print("Invalid input. Please enter comma-separated numbers.")
 
-            order_string = f"{order_id}|{self.user.username}|{item_name}|{quantity}|{unit_price}|{status}|{timestamp}|{handled_by}"
+            # Create the order using OrderService
+            new_orders = self.order_service.create_order(self.user.username, item_ids, self.menu_service)
 
-            FileManager.append_file(self.orders_file_path, order_string)
-            print("Order placed successfully!")
+            if new_orders:
+                print("\nOrder placed successfully!")
+                print("\n=== Order Details ===")
+                total = 0
+                for order in new_orders:
+                    subtotal = order.unit_price * order.quantity
+                    print(f"Item: {order.item_name}")
+                    print(f"Quantity: {order.quantity}")
+                    print(f"Price per unit: ${order.unit_price:.2f}")
+                    print(f"Subtotal: ${subtotal:.2f}\n")
+                    total += subtotal
+                print(f"Total Order Amount: ${total:.2f}")
+            else:
+                print("Failed to place order.")
 
-        except FileError as e:
-            print(f"Error placing order: {e}")
-
+        except Exception as e:
+            print(f"Error placing order: {str(e)}")
     def view_order_history(self):
         print("\n=== Order History ===")
         try:
