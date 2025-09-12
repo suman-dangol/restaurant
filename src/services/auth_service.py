@@ -3,8 +3,6 @@ from src.models.user import Admin, Staff, Customer
 from src.utils.file_manager import FileManager
 from src.utils.exceptions import FileError, AuthError
 
-
-
 class AuthService:
     def __init__(self, user_file_path = "src/data/users.txt"):
         self.user_file_path = user_file_path

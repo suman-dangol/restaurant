@@ -1,11 +1,11 @@
 from src.services.menu_service import MenuService
-from src.services.order_service import OrderService  # Import OrderService
+from src.services.order_service import OrderService  
 import datetime
 class AdminUI:
     def __init__(self, user):
         self.user = user
-        self.menu_service = MenuService()  # Instantiate MenuService
-        self.order_service = OrderService() # Instantiate OrderService
+        self.menu_service = MenuService()  
+        self.order_service = OrderService()
 
     def show_menu(self):
         while True:

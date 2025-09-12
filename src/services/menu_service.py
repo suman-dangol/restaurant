@@ -9,7 +9,7 @@ class MenuService:
         self.menu_items = self.load_menu()
 
     def load_menu(self):
-        """Loads menu items from the menu file."""
+       
         try:
             lines = FileManager.read_file(self.menu_file_path)
             menu_items = []
@@ -78,7 +78,7 @@ class MenuService:
             if price:
                 item.price = validate_price(price)
 
-            self._save_menu_to_file() # Save changes to file
+            self._save_menu_to_file() 
             return True
         except FileError as e:
             print(f"Error updating menu item: {e}")
@@ -116,4 +116,5 @@ class MenuService:
          try:
              lines = [f"{item.item_id}|{item.name}|{item.category}|{item.price}" for item in self.menu_items]
              FileManager.write_file(self.menu_file_path, lines)
-         except FileError as e:             print(f"Error saving menu to file: {e}")
+         except FileError as e:
+             print(f"Error saving menu to file: {e}")

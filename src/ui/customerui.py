@@ -1,6 +1,6 @@
 import time
 from src.utils.file_manager import FileManager
-from src.utils.exceptions import FileError, ValidationError
+from src.utils.exceptions import FileError
 from src.services.menu_service import MenuService
 from src.services.order_service import OrderService
 

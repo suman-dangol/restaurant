@@ -61,7 +61,6 @@ class OrderService:
             timestamp = str(int(time.time()))
             new_orders = []
 
-            # Check if file exists and has header
             file_exists = FileManager.file_exists(self.order_file_path)
             
             # Create separate order entries for each item
@@ -93,8 +92,6 @@ class OrderService:
                     timestamp=timestamp,
                     handled_by="N/A"
                 )
-
-                # Convert order to string format
                 order_str = str(new_order)
 
                 try:
@@ -104,9 +101,7 @@ class OrderService:
                         FileManager.write_file(self.order_file_path, [header])
                         file_exists = True
                     
-                    # Save to file
                     FileManager.append_file(self.order_file_path, order_str)
-                    
                     # Update in-memory list and new_orders list
                     self.orders.append(new_order)
                     new_orders.append(new_order)
@@ -130,13 +125,11 @@ class OrderService:
                 return order
         return None
 
-    def get_orders_by_customer_username(self, customer_username):
-        """Returns a list of orders for a given customer username."""
-        return [order for order in self.orders if order.customer_username == customer_username]
-
     def update_order_status(self, order_id, status, handled_by_username="N/A"):
+        
         """Updates the status of an order and sets the staff who handled it."""
         try:
+            
             order_id = validate_id(order_id)
             order = self.get_order_by_id(order_id)
             if not order:
@@ -176,11 +169,7 @@ class OrderService:
         if not self.orders:
             print("No orders found.")
             return None
-            
-        # Calculate total revenue
         total_revenue = sum(order.quantity * order.unit_price for order in self.orders)
-        
-        # Count total orders
         total_orders = len(self.orders)
         
         # Group orders by status
