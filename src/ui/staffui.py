@@ -163,4 +163,42 @@ class StaffUI:
             print("Invalid input. Please enter a valid item ID.")
 
     def view_sales_report(self):
-        self.order_service.generate_sales_report()
+        try:
+            self.order_service.generate_sales_report()
+        except Exception as e:
+            print(f"Error generating sales report: {e}")    
+
+
+    def update_order_status(self):
+        print("\n=== Update Order Status ===")
+        try:
+            order_id = int(input("Enter Order ID: "))
+            print("\nAvailable statuses:")
+            print("1. Preparing")
+            print("2. Ready")
+            print("3. Delivered")
+            print("4. Cancelled")
+            
+            status_choice = input("Enter status choice (1-4): ").strip()
+            
+            status_map = {
+                "1": "preparing",
+                "2": "ready",
+                "3": "delivered",
+                "4": "cancelled"
+            }
+            
+            if status_choice not in status_map:
+                print("Invalid status choice.")
+                return
+                
+            new_status = status_map[status_choice]
+            
+            # Pass the staff username to update the handled_by field
+            if self.order_service.update_order_status(order_id, new_status, self.user.username):
+                print(f"Order {order_id} status updated to {new_status} (Handled by: {self.user.username})")
+            else:
+                print("Failed to update order status")
+                
+        except ValueError:
+            print("Invalid input. Please enter a valid order ID.")

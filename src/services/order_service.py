@@ -12,6 +12,10 @@ class OrderService:
     def load_orders(self):
         """Loads orders from the orders file."""
         try:
+            # Check if file exists first
+            if not FileManager.file_exists(self.order_file_path):
+                return []
+                
             lines = FileManager.read_file(self.order_file_path)
             orders = []
             
@@ -25,16 +29,12 @@ class OrderService:
                     order_id, customer_username, item_name, quantity, unit_price, status, timestamp, handled_by = order_data
                     try:
                         order_id = int(order_id)
-                        validate_id(order_id)
                         quantity = int(quantity)
                         unit_price = float(unit_price)
                         order = Order(order_id, customer_username, item_name, quantity, unit_price, status, timestamp, handled_by)
                         orders.append(order)
                     except ValueError:
                         print(f"Invalid data format in order file. Skipping line: {line}")
-                        continue
-                    except ValidationError as e:
-                        print(f"Validation error loading order: {e}")
                         continue
                 else:
                     print(f"Skipping line due to incorrect format (expected 8 parts). Line: {line}")
@@ -53,14 +53,17 @@ class OrderService:
             # Fetch all menu items at once
             menu_items = {item.item_id: item for item in menu_service.menu_items}
             
-            # Generate new order ID
+            # Generate new order ID (same for all items in this order)
             new_order_id = 1
             if self.orders:
-                new_order_id = max(int(order.order_id) for order in self.orders) + 1
+                new_order_id = max(order.order_id for order in self.orders) + 1
 
             timestamp = str(int(time.time()))
             new_orders = []
 
+            # Check if file exists and has header
+            file_exists = FileManager.file_exists(self.order_file_path)
+            
             # Create separate order entries for each item
             for item_id in item_ids:
                 if item_id not in menu_items:
@@ -95,6 +98,12 @@ class OrderService:
                 order_str = str(new_order)
 
                 try:
+                    # If file doesn't exist, create it with header first
+                    if not file_exists:
+                        header = "order_id|customer_username|item_name|quantity|unit_price|status|timestamp|handled_by"
+                        FileManager.write_file(self.order_file_path, [header])
+                        file_exists = True
+                    
                     # Save to file
                     FileManager.append_file(self.order_file_path, order_str)
                     
@@ -102,7 +111,6 @@ class OrderService:
                     self.orders.append(new_order)
                     new_orders.append(new_order)
                     
-                    new_order_id += 1
                 except FileError as fe:
                     print(f"Error saving order to file: {fe}")
                     return None
@@ -115,7 +123,6 @@ class OrderService:
         except Exception as e:
             print(f"Unexpected error: {str(e)}")
             return None
-        
     def get_order_by_id(self, order_id):
         """Returns an order with the given ID."""
         for order in self.orders:
@@ -127,8 +134,8 @@ class OrderService:
         """Returns a list of orders for a given customer username."""
         return [order for order in self.orders if order.customer_username == customer_username]
 
-    def update_order_status(self, order_id, status):
-        """Updates the status of an order."""
+    def update_order_status(self, order_id, status, handled_by_username="N/A"):
+        """Updates the status of an order and sets the staff who handled it."""
         try:
             order_id = validate_id(order_id)
             order = self.get_order_by_id(order_id)
@@ -136,6 +143,7 @@ class OrderService:
                 raise NotFoundError(f"Order with ID {order_id} not found.")
 
             order.status = status
+            order.handled_by = handled_by_username
             self._save_orders_to_file()
             return True
         except FileError as e:

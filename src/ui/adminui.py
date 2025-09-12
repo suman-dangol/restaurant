@@ -1,6 +1,6 @@
 from src.services.menu_service import MenuService
 from src.services.order_service import OrderService  # Import OrderService
-
+import datetime
 class AdminUI:
     def __init__(self, user):
         self.user = user
@@ -12,8 +12,7 @@ class AdminUI:
             print("\n=== Admin Menu ===")
             print("1. Manage Menu Items")
             print("2. View Orders/Reports")
-            print("3. Manage Users")
-            print("4. Logout")
+            print("3. Logout")
 
             choice = input("Enter your choice: ").strip()
 
@@ -22,8 +21,6 @@ class AdminUI:
             elif choice == "2":
                 self.view_orders_reports()
             elif choice == "3":
-                self.manage_users()
-            elif choice == "4":
                 print("Logging out...")
                 break
             else:
@@ -140,18 +137,16 @@ class AdminUI:
             print("No orders found.")
             return
 
+
         print("\n--- All Orders ---")
         for order in orders:
-            print(f"Order ID: {order.order_id}, Customer ID: {order.user_id}, Total: ${order.total:.2f}, Status: {order.status}")
-            print(f"  Items: {order.items}") # Just printing item IDs for brevity
+            # print(f"Order ID: {order.order_id}, Total: ${order.total:.2f}, Status: {order.status}")
+            # print(f"  Items: {order.items}") # Just printing item IDs for brevity
+            
+            print(f"Order ID: {order.order_id}, Customer: {order.customer_username}, Item: {order.item_name}, Quantity: {order.quantity}, Unit Price: ${order.unit_price:.2f}, Status: {order.status}, Handled By: {order.handled_by}")
 
     def generate_sales_report(self):
-        report = self.order_service.generate_sales_report()
-        if not report:
-            print("Could not generate sales report.")
-            return
-
-        print("\n--- Sales Report ---")
-        print(f"Total Revenue: ${report['total_revenue']:.2f}")
-        for category, count in report['orders_by_category'].items():
-            print(f"\t- {category}: {count} orders")
+        try:
+            self.order_service.generate_sales_report()
+        except Exception as e:
+            print(f"Error generating sales report: {e}")        
