@@ -1,3 +1,4 @@
 order_id|customer_username|item_name|quantity|unit_price|status|timestamp|handled_by
-1|alice|Tomato Soup|3|4.5|pending|1757506323|N/A
+1|alice|Tomato Soup|3|4.5|ready|1757506323|N/A
 2|alice|Veggie Pizza|2|8.5|pending|1757506323|N/A
+3|alice|Tomato Soup|3|4.5|cancelled|1757664543|N/A

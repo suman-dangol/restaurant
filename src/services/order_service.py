@@ -1,7 +1,7 @@
 from src.models.order import Order
 from src.utils.file_manager import FileManager
 from src.utils.exceptions import FileError, ValidationError, NotFoundError
-from src.utils.validators import validate_id
+from src.utils.validators import validate_quantity, validate_id
 import time
 
 class OrderService:
@@ -14,14 +14,18 @@ class OrderService:
         try:
             lines = FileManager.read_file(self.order_file_path)
             orders = []
-    
+            
+            # Handle empty file case
+            if not lines:
+                return orders
+                
             for line in lines[1:]:  # Skip header line
                 order_data = line.strip().split("|")
                 if len(order_data) == 8:
                     order_id, customer_username, item_name, quantity, unit_price, status, timestamp, handled_by = order_data
                     try:
                         order_id = int(order_id)
-                        order_id = validate_id(order_id)
+                        validate_id(order_id)
                         quantity = int(quantity)
                         unit_price = float(unit_price)
                         order = Order(order_id, customer_username, item_name, quantity, unit_price, status, timestamp, handled_by)
@@ -68,11 +72,12 @@ class OrderService:
                 while True:
                     try:
                         quantity = int(input(f"Enter quantity for {item.name} (1-99): "))
-                        if 0 < quantity < 100:
-                            break
-                        print("Please enter a quantity between 1 and 99.")
+                        validate_quantity(quantity)  
+                        break
                     except ValueError:
                         print("Please enter a valid number.")
+                    except ValidationError as e:
+                        print(f"Error: {e}")
 
                 # Create new order
                 new_order = Order(
@@ -110,9 +115,17 @@ class OrderService:
         except Exception as e:
             print(f"Unexpected error: {str(e)}")
             return None
-    def get_orders_by_customer_id(self, customer_id):
-        """Returns a list of orders for a given customer ID."""
-        return [order for order in self.orders if order.customer_id == customer_id]
+        
+    def get_order_by_id(self, order_id):
+        """Returns an order with the given ID."""
+        for order in self.orders:
+            if order.order_id == order_id:
+                return order
+        return None
+
+    def get_orders_by_customer_username(self, customer_username):
+        """Returns a list of orders for a given customer username."""
+        return [order for order in self.orders if order.customer_username == customer_username]
 
     def update_order_status(self, order_id, status):
         """Updates the status of an order."""
@@ -138,7 +151,9 @@ class OrderService:
     def _save_orders_to_file(self):
         """Saves the current orders to the file."""
         try:
-            lines = ["order_id|customer_username|item_name|quantity|unit_price|status|timestamp|handled_by"] + [str(order) for order in self.orders]
+            lines = ["order_id|customer_username|item_name|quantity|unit_price|status|timestamp|handled_by"]
+            for order in self.orders:
+                lines.append(str(order))
             FileManager.write_file(self.order_file_path, lines)
         except FileError as e:
             print(f"Error saving orders to file: {e}")
@@ -148,17 +163,34 @@ class OrderService:
         return self.orders
 
     def generate_sales_report(self):
+        """Generates a sales report."""
         print("\n=== Sales Report ===")
         if not self.orders:
             print("No orders found.")
-            return
-        """Generates a sales report."""
-        total_revenue = sum(order.total for order in self.orders)
-        orders_by_category = {}  # This would require menu item category info in orders
-        # For simplicity, this example does not include category breakdown
+            return None
+            
+        # Calculate total revenue
+        total_revenue = sum(order.quantity * order.unit_price for order in self.orders)
         
-        print(f"Total Revenue: ${total_revenue:.2f}, Orders Count: {len(self.orders)}")
+        # Count total orders
+        total_orders = len(self.orders)
+        
+        # Group orders by status
+        orders_by_status = {}
+        for order in self.orders:
+            if order.status not in orders_by_status:
+                orders_by_status[order.status] = 0
+            orders_by_status[order.status] += 1
+
+        # Print detailed report
+        print(f"\nTotal Revenue: ${total_revenue:.2f}")
+        print(f"Total Orders: {total_orders}")
+        print("\nOrders by Status:")
+        for status, count in orders_by_status.items():
+            print(f"- {status.capitalize()}: {count}")
+
         return {
             'total_revenue': total_revenue,
-            'orders_by_category': orders_by_category
+            'total_orders': total_orders,
+            'orders_by_status': orders_by_status
         }

@@ -38,10 +38,6 @@ class MenuService:
             print(f"Error loading menu: {e}")
             return []
 
-    def get_menu_items_by_category(self, category):
-        """Returns a list of menu items for a given category."""
-        return [item for item in self.menu_items if item.category.lower() == category.lower()]
-
     def get_menu_item_by_id(self, item_id):
         """Returns a menu item with the given ID, or None if not found."""
         for item in self.menu_items:
@@ -52,14 +48,11 @@ class MenuService:
     def add_menu_item(self, name, category, price):
         """Adds a new menu item to the menu."""
         try:
-            # Generate a new item ID (you might want to use a better strategy)
             new_id = max([item.item_id for item in self.menu_items], default=0) + 1
             price = validate_price(price)
             new_item = MenuItem(new_id, name, category, price)
             
-            # Append to file
             FileManager.append_file(self.menu_file_path, f"{new_item.item_id}|{new_item.name}|{new_item.category}|{new_item.price}")
-            
             # Update in-memory menu
             self.menu_items.append(new_item)
             return True

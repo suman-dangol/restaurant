@@ -5,3 +5,4 @@
 5|Ice Cream Sundae|Dessert|4.75
 6|Lemonade|Beverage|2.5
 7|Coffee|Beverage|3.0
+8|Rice|Starter|9.0
