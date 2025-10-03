@@ -1,6 +1,9 @@
 order_id|customer_username|item_name|quantity|unit_price|status|timestamp|handled_by
 1|alice|Tomato Soup|3|4.5|delivered|1757506323|staff1
-2|alice|Veggie Pizza|2|8.5|pending|1757506323|N/A
+2|alice|Veggie Pizza|2|8.5|ready|1757506323|staff1
 3|alice|Tomato Soup|3|4.5|cancelled|1757664543|N/A
 4|bob|Tomato Soup|1|4.5|preparing|1757670528|staff1
 5|bob|Rice|3|9.0|pending|1757670697|N/A
+6|alice|Tomato Soup|1|4.5|pending|1758860556|N/A
+6|alice|Chocolate Cake|2|5.0|pending|1758860556|N/A
+7|bob|Tomato Soup|100|4.5|pending|1758861521|N/A
